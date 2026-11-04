@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Скрининг ЮФО — карта-фильтр турпотока</title>
+  <meta name="description" content="Сопоставимые данные о турпотоке и природоохранные ограничения в регионах Южного федерального округа. Первичный фильтр, а не рекомендация.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23159a9c' fill-opacity='.3' stroke='%23159a9c' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%231d4e89'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap&subset=cyrillic" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="logo" href="#top" aria-label="Скрининг ЮФО, в начало страницы">
+        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+          <circle cx="16" cy="16" r="14" fill="#159a9c" fill-opacity=".25" stroke="#159a9c" stroke-width="2"/>
+          <circle cx="16" cy="16" r="7" fill="#1d4e89"/>
+        </svg>
+        <span>Скрининг <b>ЮФО</b></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть меню">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Разделы страницы">
+        <a href="#map">Карта</a>
+        <a href="#data">Данные</a>
+        <a href="#method">Методика</a>
+        <a href="#about">О проекте</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Первичный фильтр · 8 регионов ЮФО</p>
+          <h1>Турпоток Крыма за&nbsp;2025&nbsp;год: <span class="nowrap">2,4 млн</span> или <span class="nowrap">7,4 млн?</span></h1>
+          <p class="lead">Ведомства считают разное и называют это одним словом. «Турист», «поездка» и «размещённое лицо» расходятся в разы, поэтому регионы нельзя сравнить напрямую.</p>
+          <p class="lead lead-strong">Мы не советуем, где открывать отель. Мы показываем сопоставимые данные и ограничения, чтобы сразу отсеять заведомо неподходящие места.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#map">Открыть карту</a>
+            <a class="btn btn-ghost" href="#limits">Что инструмент не учитывает</a>
+          </div>
+        </div>
+
+        <figure class="video-card">
+          <div class="video-poster">
+            <svg class="video-art" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <g fill="none" stroke="#ffffff" stroke-opacity=".13">
+                <circle cx="470" cy="150" r="190"/><circle cx="470" cy="150" r="130"/><circle cx="470" cy="150" r="72"/>
+                <circle cx="130" cy="270" r="96"/><circle cx="130" cy="270" r="40"/>
+              </g>
+              <circle cx="470" cy="150" r="72" fill="#159a9c" fill-opacity=".3"/>
+              <circle cx="470" cy="150" r="30" fill="#7fd6d3" fill-opacity=".8"/>
+              <circle cx="130" cy="270" r="40" fill="#159a9c" fill-opacity=".3"/>
+              <circle cx="130" cy="270" r="19" fill="#7fd6d3" fill-opacity=".8"/>
+            </svg>
+            <button class="play-btn" type="button" id="play-btn" aria-label="Запустить видео-инфографику">
+              <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+            </button>
+            <p class="video-status" id="video-status" role="status">Видео-инфографика: почему цифры расходятся</p>
+          </div>
+        </figure>
+      </div>
+
+      <div class="container">
+        <dl class="stat-row" id="hero-stats"></dl>
+      </div>
+    </section>
+
+    <!-- КАРТА -->
+    <section class="section" id="map">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Карта</p>
+          <h2>Где оценки расходятся и где действуют ограничения</h2>
+          <p class="section-lede">Внешний круг — оценка региона, внутренний — Росстата. Чем заметнее зазор между ними, тем осторожнее стоит относиться к цифрам.</p>
+        </div>
+
+        <div class="layer-bar" role="group" aria-label="Слои карты">
+          <label class="switch">
+            <input type="checkbox" role="switch" id="layer-flow" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span>Турпоток</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" role="switch" id="layer-oopt" checked>
+            <span class="switch-track switch-track-warn" aria-hidden="true"></span>
+            <span>Ограничения (ООПТ)</span>
+            <span class="tag tag-warn">демо</span>
+          </label>
+        </div>
+
+        <div class="map-layout">
+          <div class="map-frame">
+            <div id="leaflet-map" aria-label="Карта регионов ЮФО. Те же данные доступны в таблице ниже."></div>
+            <p class="map-empty" id="map-empty" hidden>Оба слоя выключены. Включите хотя бы один.</p>
+          </div>
+
+          <aside class="map-side">
+            <div class="panel">
+              <label class="field-label" for="region-select">Регион</label>
+              <select id="region-select" class="select"></select>
+              <div id="region-card" class="region-card" aria-live="polite"></div>
+            </div>
+          </aside>
+
+          <div class="panel legend" id="legend">
+              <div class="legend-block" id="legend-flow">
+                <h3 class="panel-title">Турпоток</h3>
+                <div class="legend-item">
+                  <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" class="sym-regional"/><circle cx="15" cy="15" r="6" class="sym-rosstat"/></svg>
+                  <span>Оценка региона (снаружи) и Росстата (внутри)</span>
+                </div>
+                <div class="legend-item">
+                  <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="9" class="sym-nodata"/></svg>
+                  <span>Абсолютных значений нет</span>
+                </div>
+                <div class="legend-scale" id="legend-scale"></div>
+              </div>
+              <div class="legend-block" id="legend-oopt">
+                <h3 class="panel-title">Ограничения (ООПТ)</h3>
+                <div class="legend-item">
+                  <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 6l9.5 17h-19z" class="sym-strict"/></svg>
+                  <span>Заповедник</span>
+                </div>
+                <div class="legend-item">
+                  <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 6l9 9-9 9-9-9z" class="sym-partial"/></svg>
+                  <span>Национальный или природный парк, заказник</span>
+                </div>
+                <p class="note note-warn">В исходной таблице данных об ООПТ нет. Это примеры с приблизительными координатами, а не юридические границы.</p>
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ДАННЫЕ -->
+    <section class="section section-tint" id="data">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Данные</p>
+          <h2>Один показатель, разные значения</h2>
+          <p class="section-lede" id="data-lede"></p>
+        </div>
+
+        <div class="filter-bar">
+          <div class="chips" id="region-chips" role="group" aria-label="Фильтр по регионам"></div>
+          <div class="filter-tools">
+            <label class="check">
+              <input type="checkbox" id="only-gap">
+              <span>Только с рассчитанным разрывом</span>
+            </label>
+            <button class="link-btn" type="button" id="reset-filters">Сбросить</button>
+          </div>
+        </div>
+
+        <div class="chart-grid">
+          <article class="chart-card">
+            <h3>Оценка региона и оценка Росстата</h3>
+            <p class="chart-sub">млн; только регионы, где есть обе цифры</p>
+            <div class="chart-legend">
+              <span><i class="swatch swatch-regional"></i>Оценка региона</span>
+              <span><i class="swatch swatch-rosstat"></i>Оценка Росстата</span>
+            </div>
+            <div id="chart-pairs" class="chart"></div>
+          </article>
+          <article class="chart-card">
+            <h3>Разброс между всеми источниками</h3>
+            <p class="chart-sub">во сколько раз самая высокая оценка больше самой низкой</p>
+            <div id="chart-spread" class="chart"></div>
+          </article>
+        </div>
+
+        <div class="table-card">
+          <table class="data-table" id="data-table">
+            <caption class="sr-only">Оценки турпотока по регионам ЮФО. Сортировка — по клику на заголовок колонки.</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-key="name"><button type="button">Регион</button></th>
+                <th scope="col" data-key="regionalValue" class="num"><button type="button">Оценка региона, млн</button></th>
+                <th scope="col" data-key="rosstatValue" class="num"><button type="button">Оценка Росстата, млн</button></th>
+                <th scope="col" data-key="gap" class="num"><button type="button">Разрыв, %</button></th>
+                <th scope="col" data-key="reliability"><button type="button">Источник</button></th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+          <p class="table-empty" id="table-empty" hidden>По этим фильтрам ничего нет. Сбросьте их или выберите другой регион.</p>
+        </div>
+
+        <div class="table-foot">
+          <p><b>Разрыв</b> = (оценка региона − оценка Росстата) ÷ оценка Росстата × 100%. Пропуски не заполняем и не оцениваем.</p>
+          <p class="reliability-key">
+            <span class="grade grade-a">A</span> официальная статистика
+            <span class="grade grade-b">B</span> заявление должностных лиц
+            <span class="grade grade-c">C</span> СМИ и аналитика
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- МЕТОДИКА -->
+    <section class="section" id="method">
+      <div class="container method-grid">
+        <div class="section-head">
+          <p class="eyebrow">Методика</p>
+          <h2>Как мы приводили данные к единому виду</h2>
+          <p class="section-lede">Единой методики у источников нет, поэтому мы не исправляем цифры, а делаем различия видимыми. Это рабочая версия для обсуждения.</p>
+        </div>
+
+        <div class="accordion">
+          <details open>
+            <summary>Единицы измерения</summary>
+            <div class="acc-body">
+              <p>Все оценки переведены в миллионы. Например, 378 078 размещённых лиц по Астраханской области записаны как 0,378 млн, а 420 тыс. туристов Севастополя — как 0,42 млн.</p>
+              <p>Единица при этом остаётся разной: человек, поездка или размещённое лицо. Она указана рядом с каждым источником.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Период сравнения</summary>
+            <div class="acc-body">
+              <p>Базовый период — итоги 2025 года. Частичные срезы, например «январь–сентябрь», в основную колонку не попадают.</p>
+              <p>Исключение — Астраханская область: единственная найденная пара значений относится к 2023 году. Строка помечена, и сравнивать её с другими регионами напрямую нельзя.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Определения показателей</summary>
+            <div class="acc-body">
+              <p>«Турист», «турпоток», «поездка», «экскурсант» и «размещённое лицо» в разных источниках означают разное. Росстат по КСР охватывает только коллективные средства размещения, без частного сектора. Однодневные посетители в основной показатель не входят.</p>
+              <p>Поэтому разрыв не равен ошибке одного из ведомств: он показывает, насколько различаются измерения.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Шкала надёжности источников</summary>
+            <div class="acc-body">
+              <ul class="plain-list">
+                <li><span class="grade grade-a">A</span> Официальная статистика: Росстат, Минэкономразвития, ФНС, Банк России.</li>
+                <li><span class="grade grade-b">B</span> Публичные заявления должностных лиц. Методика подсчёта обычно не раскрыта.</li>
+                <li><span class="grade grade-c">C</span> Пересказ в СМИ, аналитика, данные операторов связи. Требуют проверки по первоисточнику.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary>Как считаются разрыв и разброс</summary>
+            <div class="acc-body">
+              <p><b>Разрыв</b> сравнивает основную оценку региона с оценкой Росстата. Считается, только если есть обе цифры. <b>От 100%</b> — красная метка: оценки расходятся вдвое и более. <b>Ниже 100%</b> — жёлтая.</p>
+              <p><b>Разброс</b> — отношение максимальной оценки к минимальной среди всех источников. Для Крыма разрыв и разброс различаются: разрыв считается от 6,9 млн, а в разброс входит и 7,4 млн вице-премьера.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Известные проблемы данных</summary>
+            <div class="acc-body">
+              <ul class="plain-list plain-list-dash">
+                <li><b>Границы показателя.</b> 7,4 млн по Крыму совпадают с суммой 6,9 млн (Крым) и 0,5 млн (Севастополь). Это гипотеза: источники её не подтверждают.</li>
+                <li><b>Знак динамики.</b> Волгоградская область в 2025 году: −5% или +5% к 2024-му, в зависимости от выбранной цифры.</li>
+                <li><b>Колонка «Росстат».</b> Цифры 9,3, 2,4 и 1,9 млн опубликованы Минэкономразвития как поездки «по данным статистики», а Финмаркет со ссылкой на Росстат приводит их как туристов. Первичные таблицы Росстата ещё нужно сверить.</li>
+                <li><b>Неполнота.</b> Полные таблицы Росстата за 2024–2025 годы по большинству регионов получить не удалось.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ОГРАНИЧЕНИЯ -->
+    <section class="section section-limits" id="limits">
+      <div class="container">
+        <div class="limits-card">
+          <div class="limits-head">
+            <p class="eyebrow eyebrow-warn">
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2l8.5 15h-17z" fill="currentColor"/><path d="M10 8v4.5M10 14.5v.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+              Ограничения инструмента
+            </p>
+            <h2>Это только первичный фильтр</h2>
+            <p class="limits-claim">Наш инструмент <strong>не учитывает</strong> спрос, конкурентов, логистику и стоимость земли.</p>
+            <p>Он помогает отсеять заведомо неподходящие варианты, но не отвечает на вопрос, где стоит инвестировать. После фильтра нужен отдельный анализ каждой локации.</p>
+          </div>
+
+          <ul class="limits-grid">
+            <li><h3>Спрос</h3><p>Турпоток показывает, сколько людей приехало, а не сколько готовы платить и за что.</p></li>
+            <li><h3>Конкуренты</h3><p>Мы не оцениваем насыщенность рынка и загрузку конкретных объектов.</p></li>
+            <li><h3>Логистика</h3><p>Транспортная доступность локации и её сезонные ограничения не анализируются.</p></li>
+            <li><h3>Стоимость земли</h3><p>Цены, права на участки и градостроительный режим остаются вне модели.</p></li>
+          </ul>
+
+          <div class="limits-data">
+            <h3>И ещё про сами данные</h3>
+            <ul class="plain-list plain-list-dash">
+              <li id="limit-coverage"></li>
+              <li>Данные региональны: внутри одного региона условия могут сильно различаться.</li>
+              <li>Слой ООПТ демонстрационный. Режим зависит от категории и положения конкретной территории (33-ФЗ), поэтому его нужно проверять по кадастру.</li>
+              <li>Многие цифры взяты из пересказов в СМИ. Перед использованием их нужно проверить по первоисточнику.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="about">
+    <div class="container footer-grid">
+      <div>
+        <h2 class="footer-title">О проекте</h2>
+        <p>Студенческий проект о том, как сбор статистики из разрозненных источников в единый ресурс помогает принимать управленческие решения и развивать туристский бизнес.</p>
+        <p class="footer-muted">Данные собраны из открытых источников, дата сборки: 26.10.2026. Подложка карты: © Esri.</p>
+      </div>
+      <div>
+        <h3>Авторы</h3>
+        <ul id="footer-authors"></ul>
+      </div>
+      <div>
+        <h3>Наставник</h3>
+        <p id="footer-mentor"></p>
+        <h3>Код</h3>
+        <p><a id="footer-github" href="#" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="chart-tip" id="chart-tip" role="tooltip" hidden></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="JS/data.js"></script>
+  <script src="JS/script.js"></script>
+</body>
+</html>
